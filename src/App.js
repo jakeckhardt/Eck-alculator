@@ -1,102 +1,86 @@
 import React, { Component } from 'react';
-
-
-var nums = [1,2,3,4,5,6,7,8,9,0]
-
-
-
-var Screen = React.createClass({
-  propTypes: {
-    numString: React.PropTypes.string,
-  },
-
-  getInitialState: function() {
-    return{
-      numString: "0"
-    }
-  },
-
-  render: function() {
-    return (
-      <p className="screen">{this.state.numString}</p>
-    );
-  },
-});
-
-
-
-
-
-
-var Total = React.createClass({
-  propTypes: {
-    totalNum: React.PropTypes.number,
-  },
-
-  getInitialState: function() {
-    return{
-      totalNum: 0
-    }
-  },
-
-  render: function() {
-    return (
-      <h1 className="total">{this.state.totalNum}</h1>
-    );
-  }
-});
-
-
-
-
-
-var Numbers = React.createClass({
-  addToScreen: function(e) {
-    console.log('addToScreen', e);
-  },
-
-  render: function(props) {
-    return (
-      <div>
-        <div className="buttonContainer">
-          <button className="numButton" onClick={function() {this.onChange(1);}}>1</button>
-          <button className="numButton" onClick={this.addToScreen}>2</button>
-          <button className="numButton" onClick={this.addToScreen}>3</button>
-        </div>
-        <div className="buttonContainer">  
-          <button className="numButton" onClick={this.addToScreen}>4</button>
-          <button className="numButton" onClick={this.addToScreen}>5</button>
-          <button className="numButton" onClick={this.addToScreen}>6</button>
-        </div>
-        <div className="buttonContainer">  
-          <button className="numButton" onClick={this.addToScreen}>7</button>
-          <button className="numButton" onClick={this.addToScreen}>8</button>
-          <button className="numButton" onClick={this.addToScreen}>9</button>
-        </div>
-        <div className="buttonContainer">  
-          <button className="numButton" onClick={this.addToScreen}>0</button>
-        </div>
-      </div>
-    );
-  },
-
-  propTypes: {
-    onChange: React.PropTypes.func,
-  },
-});
-
+import Display from './display';
+import NumButton from './numButton';
 
 
 
 class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      mathProb: "0",
+      total: "0"
+    }
+
+    this.addNum = this.addNum.bind(this)
+  }
+  
   render() {
     return (
-      <div className="application">
-        <Screen />
-        <Total />
-        <Numbers />
+      <div className="container">
+        <Display mathProb={this.state.mathProb} total={this.state.total} />
+        <div className="buttonContainer">
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"9"} />
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"8"} />
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"7"} />
+          <NumButton numClass={"opButton"} addNum={this.addNum} val={"+"} />
+        </div>
+        <div className="buttonContainer">
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"6"} />
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"5"} />
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"4"} />
+          <NumButton numClass={"opButton"} addNum={this.addNum} val={"-"} />
+        </div>
+        <div className="buttonContainer">
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"3"} />
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"2"} />
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"1"} />
+          <NumButton numClass={"opButton"} addNum={this.addNum} val={"*"} />
+        </div>
+        <div className="buttonContainer">
+          <NumButton numClass={"numButton"} addNum={this.addNum} val={"0"} />
+          <NumButton numClass={"opButton"} addNum={this.addNum} val={"/"} />
+        </div>
+        <div className="buttonContainer">
+          <NumButton numClass={"opButton"} addNum={this.addNum} val={"CE"} />
+          <NumButton numClass={"opButton"} addNum={this.addNum} val={"="} />
+        </div>
       </div>
     );
+  }
+
+  addNum(e) {
+    const val = e.target.value;
+    const classId = e.target.className;
+    const lastChar = this.state.mathProb.slice(-1);
+    if (this.state.mathProb == "0" || this.state.mathProb == "error") {
+      if (val != "CE" && val != "=" && val != "*" && val != "/") {
+        this.setState({mathProb: this.state.mathProb = ""});
+        this.setState({mathProb: this.state.mathProb += val});
+      } else if (val == "CE") {
+        this.setState({mathProb: this.state.mathProb = "0"});
+        this.setState({total: this.state.total = "0"});
+      }
+    } else if (val == "CE") {
+      this.setState({mathProb: this.state.mathProb = "0"});
+      this.setState({total: this.state.total = "0"});
+    } else if (val == "=") {
+      if (lastChar == "+" || lastChar == "-" || lastChar == "*" || lastChar == "/"){
+        this.setState({mathProb: "error"});
+        this.setState({total: this.state.total = "0"});
+      } else {
+        var totalNum = eval(this.state.mathProb).toString();
+        this.setState({mathProb: this.state.total = totalNum});
+      }
+    } else if (lastChar == "+" || lastChar == "-" || lastChar == "*" || lastChar == "/") {
+      if (val == "+" || val == "-" || val == "*" || val == "/") {
+        this.setState({mathProb: this.state.mathProb.slice(0,-1) + val});
+      } else {
+        this.setState({mathProb: this.state.mathProb += val});
+      }
+    } else if (lastChar != "+" || lastChar != "-" || lastChar != "*" || lastChar != "/") {
+      this.setState({mathProb: this.state.mathProb += val});
+    }
   }
 }
 
